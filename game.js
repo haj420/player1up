@@ -1,12 +1,3 @@
-/********************************************************************
- * PINBALL — FULL GAME.JS WITH MOBILE SUPPORT
- * - Touch flippers (left/right tap)
- * - Touch plunger (tap or drag)
- * - Touch nudge (swipe)
- * - Multi-touch support
- * - Desktop keyboard still works
- ********************************************************************/
-
 const canvas = document.getElementById("pinballCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -33,7 +24,7 @@ let score = 0;
 let balls = 3;
 let gameOver = false;
 
-// -------------------- NUDGE --------------------
+// -------------------- NUDGE CONTROLS --------------------
 let nudgeX = 0;
 let nudgeY = 0;
 const nudgeStrength = 40;
@@ -49,8 +40,8 @@ const plungerChargeRate = 480;
 const flipperLength = 90;
 const flipperWidth = 14;
 
-let leftPivotX = 60;
-let rightPivotX = W - 60;
+const leftPivotX = 60;
+const rightPivotX = W - 60;
 const flipperPivotY = H - 85;
 
 // Inverted flip direction
@@ -73,7 +64,7 @@ const bumpers = [
   { x: W * 0.42, y: H * 0.20, r: 20, score: 750, force: 300 }
 ];
 
-// -------------------- SLINGSHOTS --------------------
+//-------------------- SLINGSHOTS --------------------
 const slingshots = [
   {
     x1: 20,
@@ -102,10 +93,12 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "a" || e.key === "A") leftActiveState = true;
   if (e.key === "d" || e.key === "D") rightActiveState = true;
 
+  // Plunger charge (W)
   if ((e.key === "w" || e.key === "W") && ball.inShooter) {
     plungerCharging = true;
   }
 
+  // Nudge controls (arrows)
   if (e.key === "ArrowLeft") nudgeX = -nudgeStrength;
   if (e.key === "ArrowRight") nudgeX = nudgeStrength;
   if (e.key === "ArrowUp") nudgeY = -nudgeStrength;
@@ -125,32 +118,29 @@ window.addEventListener("keyup", (e) => {
 });
 
 // -------------------- MOBILE TOUCH INPUT --------------------
-
-// Track active touches for multi-touch flippers
 let activeTouches = {};
 
 canvas.addEventListener("touchstart", (e) => {
   e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
 
-  for (let touch of e.changedTouches) {
+  for (const touch of e.changedTouches) {
     const id = touch.identifier;
-    const rect = canvas.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-
     activeTouches[id] = { x, y };
 
-    // LEFT FLIPPER
+    // Left flipper: left third
     if (x < W * 0.33) {
       leftActiveState = true;
     }
 
-    // RIGHT FLIPPER
+    // Right flipper: right third
     if (x > W * 0.66) {
       rightActiveState = true;
     }
 
-    // PLUNGER AREA
+    // Plunger: right side shooter lane
     if (ball.inShooter && x > W - 80) {
       plungerCharging = true;
     }
@@ -159,16 +149,15 @@ canvas.addEventListener("touchstart", (e) => {
 
 canvas.addEventListener("touchmove", (e) => {
   e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
 
-  for (let touch of e.changedTouches) {
+  for (const touch of e.changedTouches) {
     const id = touch.identifier;
-    const rect = canvas.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-
     activeTouches[id] = { x, y };
 
-    // DRAG PLUNGER
+    // Optional drag-to-charge plunger
     if (plungerCharging && ball.inShooter) {
       const pull = Math.max(0, Math.min(H - y, 200));
       plungerPower = pull * 3;
@@ -179,18 +168,16 @@ canvas.addEventListener("touchmove", (e) => {
 canvas.addEventListener("touchend", (e) => {
   e.preventDefault();
 
-  for (let touch of e.changedTouches) {
+  for (const touch of e.changedTouches) {
     const id = touch.identifier;
     const prev = activeTouches[id];
     if (!prev) continue;
 
     const x = prev.x;
 
-    // Release flippers
     if (x < W * 0.33) leftActiveState = false;
     if (x > W * 0.66) rightActiveState = false;
 
-    // Release plunger
     if (plungerCharging) {
       plungerCharging = false;
       launchBallWithPower();
@@ -202,7 +189,9 @@ canvas.addEventListener("touchend", (e) => {
 
 // -------------------- RESET BUTTON --------------------
 window.addEventListener("click", (e) => {
-  if (e.target.id === "resetPinball") resetGame();
+  if (e.target.id === "resetPinball") {
+    resetGame();
+  }
 });
 
 function resetGame() {
@@ -243,7 +232,7 @@ function lerp(a, b, t) {
 }
 
 function updateFlippers(dt) {
-  const t = Math.min(1, dt * 30); // faster Stern-like flippers
+  const t = Math.min(1, dt * 30); // snappier flippers
   leftAngle = lerp(leftAngle, leftActiveState ? leftActive : leftRest, t);
   rightAngle = lerp(rightAngle, rightActiveState ? rightActive : rightRest, t);
 }
@@ -285,7 +274,7 @@ function reflectBallFromSegment(x1, y1, x2, y2) {
     ball.vx -= 2 * dot * nx;
     ball.vy -= 2 * dot * ny;
 
-    // Always boost ball on flipper hit
+    // Always give the ball a kick off the flipper
     const boost = 260;
     ball.vx += nx * boost;
     ball.vy += ny * boost;
@@ -361,6 +350,7 @@ function handleSlingshotCollisions() {
 
       score += s.score;
 
+      // LED flash
       s.flash = 1;
     }
   }
@@ -382,21 +372,26 @@ function update(dt) {
 
   updateFlippers(dt);
 
+  // Plunger charge
   if (plungerCharging && ball.inShooter) {
     plungerPower += plungerChargeRate * dt;
     if (plungerPower > plungerMax) plungerPower = plungerMax;
   }
 
+  // Gravity only when in play
   if (!ball.inShooter) {
     ball.vy += gravity * dt;
   }
 
+  // Apply velocity + nudge
   ball.x += ball.vx * dt + nudgeX * dt;
   ball.y += ball.vy * dt + nudgeY * dt;
 
+  // Damping
   ball.vx *= damping;
   ball.vy *= damping;
 
+  // Walls (only when in play)
   if (!ball.inShooter) {
     if (ball.x - ball.r < 10) {
       ball.x = 10 + ball.r;
@@ -412,19 +407,33 @@ function update(dt) {
     }
   }
 
+  // Drain
   if (ball.y - ball.r > H + 40) {
     loseBall();
   }
 
+  // Flipper collisions
   const leftSeg = flipperEndpoints(leftPivotX, flipperPivotY, leftAngle);
   const rightSeg = flipperEndpoints(rightPivotX, flipperPivotY, rightAngle);
 
-  reflectBallFromSegment(leftSeg.x1, leftSeg.y1, leftSeg.x2, leftSeg.y2);
-  reflectBallFromSegment(rightSeg.x1, rightSeg.y1, rightSeg.x2, rightSeg.y2);
+  reflectBallFromSegment(
+    leftSeg.x1,
+    leftSeg.y1,
+    leftSeg.x2,
+    leftSeg.y2
+  );
+  reflectBallFromSegment(
+    rightSeg.x1,
+    rightSeg.y1,
+    rightSeg.x2,
+    rightSeg.y2
+  );
 
+  // Bumpers + slings
   handleBumperCollisions();
   handleSlingshotCollisions();
 
+  // Fade slingshot LED flash
   for (const s of slingshots) {
     s.flash = Math.max(0, s.flash - dt * 4);
   }
@@ -523,6 +532,97 @@ function drawFlipper(px, py, angle, isLeft) {
   const dy = Math.sin(angle) * flipperLength;
   const x2 = px + dx;
   const y2 = py + dy;
-}
+
   ctx.save();
-  ctx.strokeStyle = isLeft ? "#ff2bd
+  ctx.strokeStyle = isLeft ? "#ff2bd6" : "#3df5ff";
+  ctx.lineWidth = flipperWidth;
+  ctx.lineCap = "round";
+  ctx.shadowColor = ctx.strokeStyle;
+  ctx.shadowBlur = 12;
+
+  ctx.beginPath();
+  ctx.moveTo(px, py);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  drawDMD();
+
+  // Playfield border
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.25)";
+  ctx.lineWidth = 4;
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(8, 48, W - 16, H - 56, 18);
+    ctx.stroke();
+  } else {
+    ctx.strokeRect(8, 48, W - 16, H - 56);
+  }
+  ctx.restore();
+
+  drawSlingshots();
+  drawPlungerUI();
+
+  // Bumpers
+  ctx.save();
+  bumpers.forEach((b) => {
+    const grad = ctx.createRadialGradient(
+      b.x - 4,
+      b.y - 4,
+      2,
+      b.x,
+      b.y,
+      b.r + 4
+    );
+    grad.addColorStop(0, "#ffffff");
+    grad.addColorStop(1, "#ff2bd6");
+    ctx.fillStyle = grad;
+    ctx.shadowColor = "#ff2bd6";
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.restore();
+
+  // Ball
+  ctx.save();
+  const grad = ctx.createRadialGradient(
+    ball.x - 3,
+    ball.y - 3,
+    2,
+    ball.x,
+    ball.y,
+    ball.r + 2
+  );
+  grad.addColorStop(0, "#ffffff");
+  grad.addColorStop(1, "#3df5ff");
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Flippers
+  drawFlipper(leftPivotX, flipperPivotY, leftAngle, true);
+  drawFlipper(rightPivotX, flipperPivotY, rightAngle, false);
+}
+
+// -------------------- LOOP --------------------
+function loop(timestamp) {
+  if (!lastTime) lastTime = timestamp;
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+
+loadBallIntoShooter();
+requestAnimationFrame(loop);
