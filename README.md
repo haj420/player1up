@@ -7,3 +7,5 @@
 - Need to add slingshots to top courners of the game. 
 - Save high score
 - Give 5 balls instead of 3
+- resize game to better resemble actual size
+- adjust ball speed
