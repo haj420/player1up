@@ -57,6 +57,23 @@ let rightAngle = rightRest;
 let leftActiveState = false;
 let rightActiveState = false;
 
+// TOUCH CONTROLS FOR MOBILE
+window.addEventListener('touchstart', (e) => {
+  const touch = e.touches[0];
+  if (!touch) return;
+
+  if (touch.pageX < W / 2) {
+    leftActiveState = true;
+  } else {
+    rightActiveState = true;
+  }
+});
+
+window.addEventListener('touchend', () => {
+  leftActiveState = false;
+  rightActiveState = false;
+});
+
 // -------------------- BUMPERS --------------------
 const bumpers = [
   { x: W * 0.22, y: H * 0.33, r: 18, score: 500, force: 260 },
