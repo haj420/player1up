@@ -1,5 +1,5 @@
 # player1up
-## This is a site build of Player 1UP that includes an interactive pinball game written in JS.
+## This is a site build for Player 1UP that includes an interactive pinball game written in JS.
 
 ## TODO
 - Flippers have issue with solidity. 
