@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Player 1UP • Rock Hill Arcade Bar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="logo">Player <span>1UP</span>
+    
+    </div>
+    <nav class="nav">
+      <a href="#hero">Home</a>
+      <a href="#games">Games</a>
+      <a href="#bar">Bar</a>
+      <a href="#events">Events</a>
+      <a href="#contact">Visit</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section id="hero" class="hero">
+      <div class="hero-content">
+        <h1>Rock Hill’s Retro Arcade Bar</h1>
+        <p>
+          Pinball, fighters, racers, cold drinks, and good vibes — all under one neon‑lit roof.
+          Located in the heart of Old Town Rock Hill, Player 1UP blends classic arcade nostalgia
+          with a modern bar atmosphere.
+        </p>
+        <button class="primary-btn"
+          onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
+          Book an Event
+        </button>
+      </div>
+
+      <!-- MINI PINBALL GAME -->
+      <div class="hero-game">
+        <h2>Mini Pinball</h2>
+        <p class="hero-game-subtitle">
+          Press <strong>A</strong> / <strong>D</strong> to flip. Keep the ball alive!
+        </p>
+        <canvas id="pinballCanvas" width="360" height="480"></canvas>
+        
+        <button id="resetPinball" class="primary-btn">Reset Game</button>
+
+      </div>
+    </section>
+
+    <!-- GAMES -->
+    <section id="games" class="section section-alt">
+      <div class="section-inner">
+        <h2>Arcade • Pinball • Console Lounge</h2>
+
+        <div class="cards">
+          <article class="card">
+            <h3>Pinball Machines</h3>
+            <p>
+              Rock Hill’s best lineup of modern and classic pinball tables — from fan‑favorite
+              franchises to LED‑packed new releases.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Retro Arcade Cabinets</h3>
+            <p>
+              Beat ’em ups, fighters, shmups, and classic coin‑ops. Bring your quarters or grab a
+              token bucket.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Modern Games & Racers</h3>
+            <p>
+              Sit‑down racers, rhythm games, and multiplayer cabinets perfect for groups and parties.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- BAR -->
+    <section id="bar" class="section">
+      <div class="section-inner">
+        <h2>Drinks, Drafts & Good Times</h2>
+        <p style="max-width: 700px; color: var(--muted);">
+          From local craft beer to classic cocktails, the bar at Player 1UP keeps the night going.
+          Grab a drink between rounds or settle in for a full evening of games, music, and neon glow.
+        </p>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section id="events" class="section section-alt">
+      <div class="section-inner">
+        <h2>Weekly Events & Tournaments</h2>
+
+        <div class="events-grid">
+          <div>
+            <h3>High Score Tuesdays</h3>
+            <p>Compete for bragging rights on rotating arcade and pinball titles.</p>
+          </div>
+
+          <div>
+            <h3>Fighting Game Brackets</h3>
+            <p>Street Fighter, Smash, Tekken — battle it out on the big screen.</p>
+          </div>
+
+          <div>
+            <h3>Themed Nights</h3>
+            <p>Retro console nights, cosplay meetups, and special community events.</p>
+          </div>
+
+          <div>
+            <h3>Private Parties</h3>
+            <p>Birthdays, team outings, or full‑venue rentals — book your event and let the games begin.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section">
+      <div class="section-inner contact-grid">
+        <div>
+          <h2>Visit Player 1UP</h2>
+          <p>
+            Find us in Old Town Rock Hill — steps away from restaurants, shops, and the Fountain Park district.
+          </p>
+
+          <ul class="contact-list">
+            <li><strong>Address:</strong> 140 E Main St Suite 140, Rock Hill, SC 29730</li>
+            <li><strong>Phone:</strong> (803) 327‑6407</li>
+            <li><strong>Email:</strong> info@player1up.com</li>
+            <li><strong>Hours:</strong> Open Tue–Sun at 4 PM</li>
+          </ul>
+        </div>
+
+        <form class="contact-form">
+          <label>
+            Name
+            <input type="text" name="name" placeholder="Your name" required />
+          </label>
+
+          <label>
+            Email
+            <input type="email" name="email" placeholder="you@example.com" required />
+          </label>
+
+          <label>
+            Message
+            <textarea name="message" rows="4"
+              placeholder="Tell us about your event or question"></textarea>
+          </label>
+
+          <button type="submit" class="primary-btn">Send Message</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Player 1UP. All rights reserved.</p>
+  </footer>
+
+  <script src="game.js"></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
