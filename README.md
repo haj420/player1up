@@ -3,6 +3,7 @@
 
 ## TODO
 - Flippers have issue with solidity. 
-- Bumpers need to be relocated for better game enjoyment
+- Bumpers need to be relocated and resized for better game enjoyment
 - Need to add slingshots to top courners of the game. 
 - Save high score
+- Give 5 balls instead of 3
