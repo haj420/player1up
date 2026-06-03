@@ -52,6 +52,11 @@ body {
   color: var(--accent);
 }
 
+#locateBtn {
+  width:70px;
+  background-color:dark blue;
+}
+
 .nav {
   display: flex;
   gap: 1.5rem;
